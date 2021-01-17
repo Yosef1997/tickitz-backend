@@ -1,12 +1,13 @@
 const { LIMIT_DATA, APP_URL } = process.env
+const data = require('../helpers/listMovies')
 
+// Showing list Movies with paging
 exports.listMovies = (req, res) => {
   const { limit = LIMIT_DATA, search = null } = req.query
   let { page = 1 } = req.query
   if (typeof (page) !== 'number') {
     page = Number(page)
   }
-  const data = require('../helpers/listMovies')
   const paging = (page * limit) - limit
   const nextPage = ((page + 1) * limit) - limit
   let nextPageData = []
@@ -37,10 +38,9 @@ exports.listMovies = (req, res) => {
     }
   })
 }
-
+// Showing list Movies based on id
 exports.detailMovies = (req, res) => {
   const number = parseInt(req.params.id)
-  const data = require('../helpers/listMovies')
   const results = data.find(movie => movie.id === number)
 
   return res.json({
@@ -48,4 +48,50 @@ exports.detailMovies = (req, res) => {
     message: 'Details of Movie',
     results
   })
+}
+
+exports.genreMovies = (req, res) => {
+  const genre = req.params.name
+  const results = data.filter(movies => {
+    return movies.genre.toLowerCase().includes(genre.toLowerCase())
+  })
+  return res.json({
+    success: true,
+    message: `List Movies With Genre${genre}`,
+    results
+  })
+}
+
+exports.post = (req, res) => {
+  const newData = [data.length + 1, req.body]
+  data.push(newData)
+  return res.json(data)
+}
+
+exports.put = (req, res) => {
+  const newData = [data.length + 1, req.body]
+  data.push(newData)
+  return res.json(data)
+}
+
+exports.patch = (req, res) => {
+  const id = parseInt(req.params.id)
+  const results = data.filter(movies => {
+    if (movies.id === id) {
+      movies.id = id
+      movies.name = req.body.name
+      movies.genre = req.body.genre
+      return movies
+    } else {
+      return res.status(404)
+    }
+  })
+
+  return res.json(results)
+}
+
+exports.delete = (req, res) => {
+  const id = parseInt(req.params.id)
+  const results = data.filter(movies => movies.id !== id)
+  return res.json(results)
 }

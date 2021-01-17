@@ -11,12 +11,14 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(cors('*'))
+app.use(express.json())
+// user
+app.use('/movies', require('./src/routes/movies'))
+app.use('/genre', require('./src/routes/genre'))
+app.use('/cinemas', require('./src/routes/cinemas'))
 
-// app.use('/movies', require('./src/routes/movies'))
-
-// app.use('/movies/:id', require('./src/routes/movies'))
-
-// app.use('/genre/:name', require('./src/routes/genre'))
+// admin
+app.use('/admin/movies', require('./src/routes/movies'))
 
 // app.get('/', (request, response) => {
 //   const { username, password } = request.body
@@ -82,12 +84,12 @@ app.use(cors('*'))
 // })
 
 // Get/admin/genre
-app.get('/admin/genre', (req, res) => {
-  const data = require('./src/helpers/listMovies')
-  const dataAdmGenre = data.map(movies => movies.genre)
+// app.get('/admin/genre', (req, res) => {
+//   const data = require('./src/helpers/listMovies')
+//   const dataAdmGenre = data.map(movies => movies.genre)
 
-  return res.json(dataAdmGenre)
-})
+//   return res.json(dataAdmGenre)
+// })
 
 // // Get/admin/genre/:id
 // app.get('/admin/genre/:id', (req, res) => {
