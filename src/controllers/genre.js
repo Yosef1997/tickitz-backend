@@ -1,6 +1,6 @@
 const { LIMIT_DATA, APP_URL } = process.env
 const data = require('../helpers/listGenre')
-const Movies = require('../helpers/listMovies')
+const dataMovies = require('../helpers/listMovies')
 
 exports.listGenre = (req, res) => {
   const { limit = LIMIT_DATA, search = null } = req.query
@@ -47,7 +47,7 @@ exports.Genre = (req, res) => {
 
 exports.detailGenre = (req, res) => {
   const genre = req.params.name
-  const results = Movies.filter(movies => {
+  const results = dataMovies.filter(movies => {
     return movies.genre.toLowerCase().includes(genre.toLowerCase())
   })
   return res.json({

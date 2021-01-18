@@ -14,7 +14,7 @@ app.use(cors('*'))
 // app.use(express.json())
 // user
 app.use('/movies', require('./src/routes/movies'))
-app.use('/genre', require('./src/routes/genre'))
+app.use('/', require('./src/routes/genre'))
 app.use('/cinemas', require('./src/routes/cinemas'))
 
 // admin

@@ -2,7 +2,7 @@ const routes = require('express').Router()
 const genreController = require('../controllers/genre')
 // user
 routes.get('/', genreController.listGenre)
-routes.get('/:name', genreController.detailGenre)
+routes.get('/genre/:name', genreController.detailGenre)
 
 // Admin
 routes.get('/', genreController.listGenre)
