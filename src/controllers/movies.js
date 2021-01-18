@@ -50,18 +50,6 @@ exports.detailMovies = (req, res) => {
   })
 }
 
-exports.genreMovies = (req, res) => {
-  const genre = req.params.name
-  const results = data.filter(movies => {
-    return movies.genre.toLowerCase().includes(genre.toLowerCase())
-  })
-  return res.json({
-    success: true,
-    message: `List Movies With Genre${genre}`,
-    results
-  })
-}
-
 exports.post = (req, res) => {
   const newData = [data.length + 1, req.body]
   data.push(newData)

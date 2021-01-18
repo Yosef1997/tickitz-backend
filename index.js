@@ -11,7 +11,7 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(cors('*'))
-app.use(express.json())
+// app.use(express.json())
 // user
 app.use('/movies', require('./src/routes/movies'))
 app.use('/genre', require('./src/routes/genre'))
@@ -19,6 +19,9 @@ app.use('/cinemas', require('./src/routes/cinemas'))
 
 // admin
 app.use('/admin/movies', require('./src/routes/movies'))
+app.use('/admin/genre', require('./src/routes/genre'))
+
+app.use('/admin/cinemas', require('./src/routes/cinemas'))
 
 // app.get('/', (request, response) => {
 //   const { username, password } = request.body
