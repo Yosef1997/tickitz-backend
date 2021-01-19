@@ -135,7 +135,7 @@ module.exports = [
     name: 'Tom and Jerry',
     releaseDate: '11 February 2021',
     duration: null,
-    genre: 'Comedy, Animation, Adventure, Comedy',
+    genre: 'Comedy, Animation, Adventure',
     createdAt: '2021',
     description: 'Adaption of the classic Hanna-Barbera property, which reveals how Tom and Jerry first meet and form their rivalry.',
     director: 'Tim Story',

@@ -8,9 +8,9 @@ routes.get('/:id', moviesController.detailMovies)
 // Admin
 routes.get('/', moviesController.listMovies)
 routes.get('/:id', moviesController.detailMovies)
-routes.post('/', moviesController.post)
-routes.put('/', moviesController.put)
-routes.patch('/:id', moviesController.patch)
-routes.delete('/:id', moviesController.delete)
+routes.post('/', moviesController.createMovies)
+routes.put('/', moviesController.createMovies)
+routes.patch('/:id', moviesController.updateMovie)
+routes.delete('/:id', moviesController.deleteMovie)
 
 module.exports = routes

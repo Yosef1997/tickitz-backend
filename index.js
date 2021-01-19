@@ -15,7 +15,7 @@ app.use(cors('*'))
 // user
 app.use('/movies', require('./src/routes/movies'))
 app.use('/', require('./src/routes/genre'))
-app.use('/cinemas', require('./src/routes/cinemas'))
+app.use('/', require('./src/routes/cinemas'))
 
 // admin
 app.use('/admin/movies', require('./src/routes/movies'))

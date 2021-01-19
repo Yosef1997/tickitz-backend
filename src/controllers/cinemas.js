@@ -1,45 +1,170 @@
-const data = require('../helpers/listCinemas')
+const cinemasModel = require('../models/cinemas')
 
 exports.listCinemas = (req, res) => {
-  return res.json(data)
+  const cond = req.query
+  cond.search = cond.search || ''
+  cond.page = Number(cond.page) || 1
+  cond.limit = Number(cond.limit) || 5
+  cond.dataLimit = cond.limit * cond.page
+  cond.offset = (cond.page - 1) * cond.limit
+  cond.sort = cond.sort || 'id'
+  cond.order = cond.order || 'ASC'
+
+  cinemasModel.getAllCinemas(results => {
+    return res.json({
+      success: true,
+      message: 'List of all Cinemas',
+      results
+    })
+  })
 }
 
-exports.detailCinemas = (req, res) => {
-  const id = parseInt(req.params.id)
-  const results = data.find(cinemas => cinemas.id === id)
-  return res.json(results)
+exports.detailCinema = (req, res) => {
+  const id = req.params.id
+  cinemasModel.getCinemaById(id, results => {
+    if (results.length > 0) {
+      return res.json({
+        success: true,
+        message: 'Details of Cinema',
+        results: results[0]
+      })
+    }
+    return res.status(400).json({
+      success: false,
+      message: 'Cinema not exists'
+    })
+  })
 }
 
-exports.post = (req, res) => {
-  const newData = [data.length + 1, req.body]
-  data.push(newData)
-  return res.json(data)
-}
-
-exports.put = (req, res) => {
-  const newData = [data.length + 1, req.body]
-  data.push(newData)
-  return res.json(data)
-}
-
-exports.patch = (req, res) => {
-  const id = parseInt(req.params.id)
-  const results = data.filter(movies => {
-    if (movies.id === id) {
-      movies.id = id
-      movies.name = req.body.name
-      movies.genre = req.body.genre
-      return movies
-    } else {
-      return res.status(404)
+exports.createCinema = (req, res) => {
+  const data = req.body
+  cinemasModel.createCinema(data, (results) => {
+    if (results.affectedRows > 0) {
+      cinemasModel.getCinemaById(results.insertId, (finalResult) => {
+        if (finalResult.length > 0) {
+          return res.json({
+            success: true,
+            message: 'Details of Cinema',
+            results: finalResult[0]
+          })
+        }
+        return res.status(400).json({
+          success: false,
+          message: 'Failed to create Cinema  '
+        })
+      })
     }
   })
-
-  return res.json(results)
 }
 
-exports.delete = (req, res) => {
-  const id = parseInt(req.params.id)
-  const results = data.filter(movies => movies.id !== id)
-  return res.json(results)
+exports.deleteCinema = async (req, res) => {
+  const { id } = req.params
+  const initialResult = await cinemasModel.getCinemaByIdAsync(id)
+  if (initialResult.length > 0) {
+    const results = await cinemasModel.getCinemaByIdAsync(id)
+    if (results) {
+      return res.json({
+        success: true,
+        message: 'Data deleted successfully',
+        results: initialResult[0]
+      })
+    }
+  }
+  return res.json({
+    success: false,
+    message: 'Failed to delete data'
+  })
+  // movieModel.getMovieById(id, (initialResult) => {
+  //   if (initialResult.length > 0) {
+  //     movieModel.deleteMovieById(id, results => {
+  //       return res.json({
+  //         success: true,
+  //         message: 'Data deleted successfully',
+  //         results: initialResult[0]
+  //       })
+  //     })
+  //   } else {
+  //     return res.json({
+  //       success: false,
+  //       message: 'Failed to delete data'
+  //     })
+  //   }
+  // })
 }
+
+exports.updateCinema = (req, res) => {
+  const id = req.params.id
+  const data = req.body
+  cinemasModel.getCinemaById(id, initialResult => {
+    if (initialResult.length > 0) {
+      cinemasModel.updateCinema(id, data, results => {
+        return res.json({
+          success: true,
+          message: 'Update data success',
+          results: {
+            ...initialResult[0],
+            ...data
+          }
+        })
+      })
+    } else {
+      return res.json({
+        success: false,
+        message: 'Failed to update data'
+      })
+    }
+  })
+}
+
+// const data = require('../helpers/listCinemas')
+
+// exports.listCinemas = (req, res) => {
+//   return res.json(data)
+// }
+
+// exports.detailCinemas = (req, res) => {
+//   const id = parseInt(req.params.id)
+//   const results = data.find(cinemas => cinemas.id === id)
+//   return res.json(results)
+// }
+
+// exports.post = (req, res) => {
+//   const newData = {
+//     id: data.length + 1,
+//     ...req.body
+//   }
+//   data.push(newData)
+//   return res.json(data)
+// }
+
+// exports.put = (req, res) => {
+//   const newData = {
+//     id: data.length + 1,
+//     ...req.body
+//   }
+//   data.push(newData)
+//   data.push(newData)
+//   return res.json(data)
+// }
+
+// exports.patch = (req, res) => {
+//   const id = parseInt(req.params.id)
+//   const results = data.filter(movies => {
+//     if (movies.id === id) {
+//       movies.id = id
+//       movies.name = req.body.name
+//       movies.genre = req.body.genre
+//       return movies
+//     } else {
+//       return res.status(404)
+//     }
+//   })
+
+//   return res.json(results)
+// }
+
+// exports.delete = (req, res) => {
+//   const id = parseInt(req.params.id)
+//   const results = data.filter(movies => movies.id !== id)
+//   return res.json(results)
+// }
