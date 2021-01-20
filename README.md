@@ -22,6 +22,8 @@ This is non-optimized minimal backend app with mysql and node. Backend app theme
   ```
   Start Apache
   ```
+- And then
+  ```
   Start Mysql
 
 ## API SPECS
