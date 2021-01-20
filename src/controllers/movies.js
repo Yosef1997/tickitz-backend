@@ -58,24 +58,28 @@ exports.detailMovies = (req, res) => {
 }
 
 exports.createMovies = (req, res) => {
-  const data = req.body
-  movieModel.createMovies(data, (results) => {
-    if (results.affectedRows > 0) {
-      movieModel.getMovieById(results.insertId, (finalResult) => {
-        if (finalResult.length > 0) {
-          return res.json({
-            success: true,
-            message: 'Details of Movie',
-            results: finalResult[0]
-          })
-        }
-        return res.status(400).json({
-          success: false,
-          message: 'Failed to create Movie'
+  const { name, releaseDate, duration, genre, description, director, stars } = req.body
+
+  if (name === '' || releaseDate === '' || duration === '' || genre === '' || description === '' || director === '' || stars === '') {
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to create Movie, Please fill all form'
+    })
+  } else {
+    movieModel.createMovies({ name, releaseDate, duration, genre, description, director, stars }, (results) => {
+      if (results.affectedRows > 0) {
+        movieModel.getMovieById(results.insertId, (finalResult) => {
+          if (finalResult.length > 0) {
+            return res.json({
+              success: true,
+              message: 'Details of Movie',
+              results: finalResult[0]
+            })
+          }
         })
-      })
-    }
-  })
+      }
+    })
+  }
 }
 
 exports.deleteMovie = async (req, res) => {

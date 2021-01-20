@@ -45,24 +45,27 @@ exports.detailCinema = (req, res) => {
 }
 
 exports.createCinema = (req, res) => {
-  const data = req.body
-  cinemasModel.createCinema(data, (results) => {
-    if (results.affectedRows > 0) {
-      cinemasModel.getCinemaById(results.insertId, (finalResult) => {
-        if (finalResult.length > 0) {
-          return res.json({
-            success: true,
-            message: 'Details of Cinema',
-            results: finalResult[0]
-          })
-        }
-        return res.status(400).json({
-          success: false,
-          message: 'Failed to create Cinema  '
+  const { name, address, price } = req.body
+  if (name === '' || address === '' || price === '') {
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to create Cinema  '
+    })
+  } else {
+    cinemasModel.createCinema({ name, address, price }, (results) => {
+      if (results.affectedRows > 0) {
+        cinemasModel.getCinemaById(results.insertId, (finalResult) => {
+          if (finalResult.length > 0) {
+            return res.json({
+              success: true,
+              message: 'Details of Cinema',
+              results: finalResult[0]
+            })
+          }
         })
-      })
-    }
-  })
+      }
+    })
+  }
 }
 
 exports.deleteCinema = async (req, res) => {

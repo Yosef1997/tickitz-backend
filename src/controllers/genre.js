@@ -56,24 +56,27 @@ exports.detailGenre = (req, res) => {
 }
 
 exports.createGenre = (req, res) => {
-  const data = req.body
-  genreModel.createGenre(data, (results) => {
-    if (results.affectedRows > 0) {
-      genreModel.getGenreById(results.insertId, (finalResult) => {
-        if (finalResult.length > 0) {
-          return res.json({
-            success: true,
-            message: 'Details of Genre',
-            results: finalResult[0]
-          })
-        }
-        return res.status(400).json({
-          success: false,
-          message: 'Failed to create Genre  '
+  const { genre } = req.body
+  if (genre !== '') {
+    genreModel.createGenre({ genre }, (results) => {
+      if (results.affectedRows > 0) {
+        genreModel.getGenreById(results.insertId, (finalResult) => {
+          if (finalResult.length > 0) {
+            return res.json({
+              success: true,
+              message: 'Details of Genre',
+              results: finalResult[0]
+            })
+          }
         })
-      })
-    }
-  })
+      }
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to create Genre  '
+    })
+  }
 }
 
 exports.deleteGenre = async (req, res) => {
