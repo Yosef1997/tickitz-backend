@@ -74,7 +74,7 @@ exports.createGenre = (req, res) => {
   } else {
     return res.status(400).json({
       success: false,
-      message: 'Failed to create Genre  '
+      message: 'Failed to create Genre, Please fill all form'
     })
   }
 }

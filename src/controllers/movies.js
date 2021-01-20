@@ -1,5 +1,6 @@
 const { APP_URL } = process.env
 const movieModel = require('../models/movies')
+const genrerelation = require('../models/modaltest')
 
 exports.listMovies = (req, res) => {
   const cond = req.query
@@ -79,6 +80,52 @@ exports.createMovies = (req, res) => {
         })
       }
     })
+  }
+}
+
+exports.createMoviesAsync = async (req, res) => {
+  const data = req.body
+  const selectedGenre = []
+  if (typeof data.idGenres === 'object') {
+    const results = await genrerelation.checkGenresAsync(data.idGenres)
+    if (results.length !== data.idGenres.length) {
+      return res.json({
+        success: false,
+        massage: 'Some genre are unavailable'
+      })
+    } else {
+      results.forEach(item => {
+        selectedGenre.push(item.id)
+      })
+    }
+  } else if (typeof data.idGenres === 'string') {
+    const results = await genrerelation.checkGenresAsync(data.idGenres)
+    if (results.length !== data.idGenres.length) {
+      return res.json({
+        success: false,
+        massage: 'Some genre are unavailable'
+      })
+    } else {
+      results.forEach(item => {
+        selectedGenre.push(item.id)
+      })
+    }
+  }
+  const initialResult = movieModel.getMovieByIdAsync(data)
+  if (initialResult.affectedRows > 0) {
+    const movies = await movieModel.getMovieByIdAsync(initialResult.id)
+    if (movies.length > 0) {
+      return res.json({
+        success: true,
+        message: 'Create movie done',
+        results: movies[0]
+      })
+    } else {
+      return res.json({
+        success: true,
+        message: 'Fail to create Movie'
+      })
+    }
   }
 }
 

@@ -49,7 +49,7 @@ exports.createCinema = (req, res) => {
   if (name === '' || address === '' || price === '') {
     return res.status(400).json({
       success: false,
-      message: 'Failed to create Cinema  '
+      message: 'Failed to create Cinema, Please fill all form'
     })
   } else {
     cinemasModel.createCinema({ name, address, price }, (results) => {
