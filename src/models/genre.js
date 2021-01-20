@@ -23,21 +23,9 @@ exports.getAllGenre = (cb) => {
   console.log(query.sql)
 }
 
-exports.getMovieByGenre = (cond, cb) => {
-  const query = db.query(`
-    SELECT * FROM movies 
-    WHERE genre LIKE "%${cond}%"
-    `, (err, res, field) => {
-    if (err) throw err
-    // console.log(field)
-    cb(res)
-  })
-  console.log(query.sql)
-}
-
 exports.getGenreByCondition = (cond, cb) => {
   const query = db.query(`
-    SELECT * FROM genre 
+    SELECT * FROM genre
     WHERE genre LIKE "%${cond.search}%"
     ORDER BY ${cond.sort} ${cond.order}
     LIMIT ${cond.limit} OFFSET ${cond.offset}

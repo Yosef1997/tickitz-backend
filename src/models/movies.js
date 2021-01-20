@@ -23,11 +23,10 @@ exports.getAllMovies = (cb) => {
   console.log(query.sql)
 }
 
-exports.nextDataPage = (cond, cb) => {
+exports.getMovieByGenre = (cond, cb) => {
   const query = db.query(`
     SELECT * FROM movies
-    ORDER BY ${cond.sort} ${cond.order}
-    LIMIT ${cond.limit} OFFSET ${cond.nextOffset}
+    WHERE genre LIKE "%${cond}%"
     `, (err, res, field) => {
     if (err) throw err
     // console.log(field)
