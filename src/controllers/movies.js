@@ -133,7 +133,7 @@ exports.deleteMovie = async (req, res) => {
   const { id } = req.params
   const initialResult = await movieModel.getMovieByIdAsync(id)
   if (initialResult.length > 0) {
-    const results = await movieModel.getMovieByIdAsync(id)
+    const results = await movieModel.deleteMovieByIdAsync(id)
     if (results) {
       return res.json({
         success: true,

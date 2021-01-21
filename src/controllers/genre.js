@@ -19,8 +19,8 @@ exports.listGenre = (req, res) => {
       pageInfo: {
         totalData: results.length,
         currentPage: cond.page,
-        nextLink: results.length < cond.limit ? null : `${APP_URL}/movies?page=${cond.page + 1}`,
-        prevLink: cond.page > 1 ? `${APP_URL}/movies?page=${cond.page - 1}` : null
+        nextLink: results.length < cond.limit ? null : `${APP_URL}/genres/:name?page=${cond.page + 1}`,
+        prevLink: cond.page > 1 ? `${APP_URL}/genres/:name?page=${cond.page - 1}` : null
       }
     })
   })
@@ -83,7 +83,7 @@ exports.deleteGenre = async (req, res) => {
   const { id } = req.params
   const initialResult = await genreModel.getGenreByIdAsync(id)
   if (initialResult.length > 0) {
-    const results = await genreModel.getGenreByIdAsync(id)
+    const results = await genreModel.deleteGenreByIdAsync(id)
     if (results) {
       return res.json({
         success: true,
