@@ -22,7 +22,7 @@ app.use('/admin/cinemas', require('./src/routes/cinemas'))
 app.use('/', require('./src/routes/cinemas'))
 app.use('/', require('./src/routes/movies'))
 
-app.use('/test', require('./src/routes/routes'))
+// app.use('/test', require('./src/routes/routes'))
 
 // app.get('/', (request, response) => {
 //   const { username, password } = request.body

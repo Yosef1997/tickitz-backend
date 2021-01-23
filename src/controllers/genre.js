@@ -96,22 +96,6 @@ exports.deleteGenre = async (req, res) => {
     success: false,
     message: 'Failed to delete data'
   })
-  // movieModel.getMovieById(id, (initialResult) => {
-  //   if (initialResult.length > 0) {
-  //     movieModel.deleteMovieById(id, results => {
-  //       return res.json({
-  //         success: true,
-  //         message: 'Data deleted successfully',
-  //         results: initialResult[0]
-  //       })
-  //     })
-  //   } else {
-  //     return res.json({
-  //       success: false,
-  //       message: 'Failed to delete data'
-  //     })
-  //   }
-  // })
 }
 
 exports.updateGenre = (req, res) => {
@@ -137,3 +121,20 @@ exports.updateGenre = (req, res) => {
     }
   })
 }
+
+// movieModel.getMovieById(id, (initialResult) => {
+//   if (initialResult.length > 0) {
+//     movieModel.deleteMovieById(id, results => {
+//       return res.json({
+//         success: true,
+//         message: 'Data deleted successfully',
+//         results: initialResult[0]
+//       })
+//     })
+//   } else {
+//     return res.json({
+//       success: false,
+//       message: 'Failed to delete data'
+//     })
+//   }
+// })

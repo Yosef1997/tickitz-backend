@@ -1,6 +1,6 @@
-const { APP_URL } = process.env
+// const { APP_URL } = process.env
 const movieModel = require('../models/movies')
-const genrerelation = require('../models/modaltest')
+const genrerelation = require('../models/moviegenre')
 
 exports.listMovies = (req, res) => {
   const cond = req.query
@@ -83,6 +83,66 @@ exports.createMovies = (req, res) => {
   }
 }
 
+exports.deleteMovie = async (req, res) => {
+  const { id } = req.params
+  const initialResult = await movieModel.getMovieByIdAsync(id)
+  if (initialResult.length > 0) {
+    const results = await movieModel.deleteMovieByIdAsync(id)
+    if (results) {
+      return res.json({
+        success: true,
+        message: 'Data deleted successfully',
+        results: initialResult[0]
+      })
+    }
+  }
+  return res.json({
+    success: false,
+    message: 'Failed to delete data'
+  })
+}
+
+exports.updateMovie = (req, res) => {
+  const { id } = req.params
+  const data = req.body
+  movieModel.getMovieById(id, initialResult => {
+    if (initialResult.length > 0) {
+      movieModel.updateMovie(id, data, results => {
+        return res.json({
+          success: true,
+          message: 'Update data success',
+          results: {
+            ...initialResult[0],
+            ...data
+          }
+        })
+      })
+    } else {
+      return res.json({
+        success: false,
+        message: 'Failed to update data'
+      })
+    }
+  })
+}
+
+// movieModel.getMovieById(id, (initialResult) => {
+//   if (initialResult.length > 0) {
+//     movieModel.deleteMovieById(id, results => {
+//       return res.json({
+//         success: true,
+//         message: 'Data deleted successfully',
+//         results: initialResult[0]
+//       })
+//     })
+//   } else {
+//     return res.json({
+//       success: false,
+//       message: 'Failed to delete data'
+//     })
+//   }
+// })
+
 exports.createMoviesAsync = async (req, res) => {
   const data = req.body
   const selectedGenre = []
@@ -111,7 +171,7 @@ exports.createMoviesAsync = async (req, res) => {
       })
     }
   }
-  const initialResult = movieModel.getMovieByIdAsync(data)
+  const initialResult = genrerelation.createMovieGenre(data)
   if (initialResult.affectedRows > 0) {
     const movies = await movieModel.getMovieByIdAsync(initialResult.id)
     if (movies.length > 0) {
@@ -127,64 +187,4 @@ exports.createMoviesAsync = async (req, res) => {
       })
     }
   }
-}
-
-exports.deleteMovie = async (req, res) => {
-  const { id } = req.params
-  const initialResult = await movieModel.getMovieByIdAsync(id)
-  if (initialResult.length > 0) {
-    const results = await movieModel.deleteMovieByIdAsync(id)
-    if (results) {
-      return res.json({
-        success: true,
-        message: 'Data deleted successfully',
-        results: initialResult[0]
-      })
-    }
-  }
-  return res.json({
-    success: false,
-    message: 'Failed to delete data'
-  })
-}
-
-// movieModel.getMovieById(id, (initialResult) => {
-//   if (initialResult.length > 0) {
-//     movieModel.deleteMovieById(id, results => {
-//       return res.json({
-//         success: true,
-//         message: 'Data deleted successfully',
-//         results: initialResult[0]
-//       })
-//     })
-//   } else {
-//     return res.json({
-//       success: false,
-//       message: 'Failed to delete data'
-//     })
-//   }
-// })
-
-exports.updateMovie = (req, res) => {
-  const { id } = req.params
-  const data = req.body
-  movieModel.getMovieById(id, initialResult => {
-    if (initialResult.length > 0) {
-      movieModel.updateMovie(id, data, results => {
-        return res.json({
-          success: true,
-          message: 'Update data success',
-          results: {
-            ...initialResult[0],
-            ...data
-          }
-        })
-      })
-    } else {
-      return res.json({
-        success: false,
-        message: 'Failed to update data'
-      })
-    }
-  })
 }

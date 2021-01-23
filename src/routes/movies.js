@@ -9,7 +9,7 @@ routes.get('/genre/:name', moviesController.listMovieByGenre)
 // Admin
 routes.get('/', moviesController.listMovies)
 routes.get('/:id', moviesController.detailMovies)
-routes.post('/', moviesController.createMovies)
+routes.post('/', moviesController.createMoviesAsync)
 routes.put('/', moviesController.createMovies)
 routes.patch('/:id', moviesController.updateMovie)
 routes.delete('/:id', moviesController.deleteMovie)

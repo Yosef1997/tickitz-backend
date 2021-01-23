@@ -1,8 +1,8 @@
 const db = require('../helpers/db')
 
-exports.createGenreRelation = (data = {}, cb) => {
+exports.createMovieGenre = (data = {}, cb) => {
   const query = db.query(`
-  INSERT INTO genrerelationn
+  INSERT INTO genre
   (${Object.keys(data).join()})
   VALUES
   (${Object.values(data).map(item => `"${item}"`).join(',')})
@@ -16,7 +16,7 @@ exports.createGenreRelation = (data = {}, cb) => {
 
 exports.checkGenres = (data = [], cb) => {
   const query = db.query(`
-  SELECT * FROM genrerelationn
+  SELECT * FROM genre
   WHERE id IN (${data.map(item => item).join()})
   `, (err, res, field) => {
     if (err) throw err
@@ -29,7 +29,7 @@ exports.checkGenres = (data = [], cb) => {
 exports.checkGenresAsync = (data = [], cb) => {
   return new Promise((resolve, reject) => {
     const query = db.query(`
-    SELECT * FROM genrerelationn
+    SELECT * FROM genre
     WHERE id IN (${data.map(item => item).join()})
     `, (err, res, field) => {
       if (err) reject(err)
