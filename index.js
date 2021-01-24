@@ -12,6 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan('dev'))
 app.use(cors('*'))
 
+app.use('/uploads', express.static('uploads'))
 // user
 app.use('/movies', require('./src/routes/movies'))
 

@@ -1,6 +1,8 @@
 const { APP_URL } = process.env
 const movieModel = require('../models/movies')
 const genrerelation = require('../models/moviegenre')
+const multer = require('multer')
+const upload = require('../helpers/upload').single('picture')
 
 exports.listMovies = async (req, res) => {
   const cond = req.query
@@ -108,73 +110,88 @@ exports.updateMovie = (req, res) => {
   })
 }
 
-exports.createMoviesAsync = async (req, res) => {
-  const data = req.body
-  const selectedGenre = []
-  if (typeof data.idGenre === 'object') {
-    const results = await genrerelation.checkGenresAsync(data.idGenre)
-    if (results.length !== data.idGenre.length) {
+exports.createMoviesAsync = (req, res) => {
+  upload(req, res, async err => {
+    const data = req.body
+    const selectedGenre = []
+    if (err instanceof multer.MulterError) {
       return res.json({
         success: false,
-        massage: 'Some genre are unavailable'
+        message: 'Error uploading file'
       })
-    } else {
-      results.forEach(item => {
-        selectedGenre.push(item.id)
-      })
-    }
-  } else if (typeof data.idGenre === 'string') {
-    const results = await genrerelation.checkGenres(data.idGenre)
-    if (results.length !== data.idGenre.length) {
+    } else if (err) {
       return res.json({
         success: false,
-        massage: 'Some genre are unavailable'
-      })
-    } else {
-      results.forEach(item => {
-        selectedGenre.push(item.id)
+        message: 'Error uploading file'
       })
     }
-  }
-  const movieData = {
-    name: data.name,
-    releaseDate: data.releaseDate,
-    duration: data.duration,
-    description: data.description,
-    director: data.director,
-    stars: data.stars
-  }
-  const initialResult = await movieModel.createMoviesAsync(movieData)
-  if (initialResult.affectedRows > 0) {
-    if (selectedGenre.length > 0) {
-      await genrerelation.createBulkMovieGenres(initialResult.insertId, selectedGenre)
+    if (typeof data.idGenre === 'object') {
+      const results = await genrerelation.checkGenresAsync(data.idGenre)
+      if (results.length !== data.idGenre.length) {
+        return res.json({
+          success: false,
+          massage: 'Some genre are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedGenre.push(item.id)
+        })
+      }
+    } else if (typeof data.idGenre === 'string') {
+      const results = await genrerelation.checkGenres(data.idGenre)
+      if (results.length !== data.idGenre.length) {
+        return res.json({
+          success: false,
+          massage: 'Some genre are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedGenre.push(item.id)
+        })
+      }
     }
-    const Genre = await genrerelation.checkGenresAsync(selectedGenre)
-    const idGenre = Genre.map(item => item.genre)
-    await movieModel.insertGenreinMovie(initialResult.insertId, idGenre)
-    const movies = await movieModel.getMovieByIdWithGenreAsync(initialResult.insertId)
-    if (movies.length > 0) {
-      return res.json({
-        success: true,
-        message: 'Movie successfully created',
-        results: {
-          id: movies[0].id,
-          name: movies[0].name,
-          releaseDate: movies[0].releaseDate,
-          duration: movies[0].duration,
-          genre: movies[0].genre,
-          description: movies[0].description,
-          director: movies[0].director,
-          stars: movies[0].stars
-        }
-      })
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: 'Failed to create Movie'
-      })
+    const movieData = {
+      name: data.name,
+      releaseDate: data.releaseDate,
+      duration: data.duration,
+      description: data.description,
+      director: data.director,
+      stars: data.stars,
+      picture: (req.file && req.file.path) || null
     }
-  }
+    console.log(movieData)
+    const initialResult = await movieModel.createMoviesAsync(movieData)
+    if (initialResult.affectedRows > 0) {
+      if (selectedGenre.length > 0) {
+        await genrerelation.createBulkMovieGenres(initialResult.insertId, selectedGenre)
+      }
+      const Genre = await genrerelation.checkGenresAsync(selectedGenre)
+      const idGenre = Genre.map(item => item.genre)
+      await movieModel.insertGenreinMovie(initialResult.insertId, idGenre)
+      const movies = await movieModel.getMovieByIdWithGenreAsync(initialResult.insertId)
+      if (movies.length > 0) {
+        return res.json({
+          success: true,
+          message: 'Movie successfully created',
+          results: {
+            id: movies[0].id,
+            name: movies[0].name,
+            releaseDate: movies[0].releaseDate,
+            duration: movies[0].duration,
+            genre: movies[0].genre,
+            description: movies[0].description,
+            director: movies[0].director,
+            stars: movies[0].stars
+          }
+        })
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'Failed to create Movie'
+        })
+      }
+    }
+  })
 }
 
 // exports.createMovies = (req, res) => {
