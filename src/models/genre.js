@@ -37,15 +37,17 @@ exports.getGenreByCondition = (cond, cb) => {
   console.log(query.sql)
 }
 
-exports.getGenreById = (id, cb) => {
-  const query = db.query(`
+exports.getGenreById = (id) => {
+  return new Promise((resolve, reject) => {
+    const query = db.query(`
     SELECT * FROM genre WHERE id=${id}
   `, (err, res, field) => {
-    if (err) throw err
-    // console.log(field)
-    cb(res)
+      if (err) reject(err)
+      // console.log(field)
+      resolve(res)
+    })
+    console.log(query.sql)
   })
-  console.log(query.sql)
 }
 
 exports.getGenreByIdAsync = (id, cb) => {
