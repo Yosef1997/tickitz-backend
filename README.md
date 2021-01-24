@@ -15,6 +15,18 @@ How To Run This App
 
     npm i
 
+    npm i express
+
+    npm i body-parser
+
+    npm i morgan
+
+    npm i cors
+
+    npm i dotenv
+
+    npm i multer
+
     And then
 
     npx nodemon
