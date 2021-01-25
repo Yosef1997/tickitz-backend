@@ -157,7 +157,8 @@ exports.createMoviesAsync = (req, res) => {
       description: data.description,
       director: data.director,
       stars: data.stars,
-      picture: (req.file && req.file.path) || null
+      picture: (req.file && req.file.path) || null,
+      createdBy: req.userData.id
     }
     console.log(movieData)
     const initialResult = await movieModel.createMoviesAsync(movieData)
@@ -181,7 +182,8 @@ exports.createMoviesAsync = (req, res) => {
             genre: movies[0].genre,
             description: movies[0].description,
             director: movies[0].director,
-            stars: movies[0].stars
+            stars: movies[0].stars,
+            createdBy: movies[0].createdBy
           }
         })
       } else {

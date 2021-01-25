@@ -72,7 +72,7 @@ exports.getMovieByIdAsync = (id) => {
 exports.getMovieByIdWithGenreAsync = (id) => {
   return new Promise((resolve, reject) => {
     const query = db.query(`
-    SELECT m.id, m.name, m.releaseDate, m.genre, m.duration, m.description, m.director, m.stars  
+    SELECT m.id, m.name, m.releaseDate, m.genre, m.duration, m.description, m.director, m.stars, m.createdBy  
     FROM movies m
     INNER JOIN movierelation mr ON m.id=mr.idMovie
     INNER JOIN genre g ON g.id=mr.idGenre

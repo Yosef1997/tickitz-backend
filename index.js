@@ -13,6 +13,7 @@ app.use(morgan('dev'))
 app.use(cors('*'))
 
 app.use('/uploads', express.static('uploads'))
+
 // user
 app.use('/movies', require('./src/routes/movies'))
 
@@ -22,7 +23,7 @@ app.use('/admin/genre', require('./src/routes/genre'))
 app.use('/admin/cinemas', require('./src/routes/cinemas'))
 app.use('/', require('./src/routes/cinemas'))
 app.use('/', require('./src/routes/movies'))
-
+app.use('/auth', require('./src/routes/auth'))
 // app.use('/test', require('./src/routes/routes'))
 
 // app.get('/', (request, response) => {
