@@ -3,9 +3,10 @@ const movieModel = require('../models/movies')
 const genrerelation = require('../models/moviegenre')
 const multer = require('multer')
 const upload = require('../helpers/upload').single('picture')
+const queryString = require('querystring')
 
 exports.listMovies = async (req, res) => {
-  const cond = req.query
+  const cond = { ...req.body }
   cond.search = cond.search || ''
   cond.page = Number(cond.page) || 1
   cond.limit = Number(cond.limit) || 5
@@ -15,6 +16,9 @@ exports.listMovies = async (req, res) => {
   cond.sort = cond.sort || 'id'
   cond.order = cond.order || 'ASC'
 
+  const nextQuery = queryString.stringify({ ...req.body, page: cond.page + 1 })
+  const prevQuery = queryString.stringify({ ...req.body, page: cond.page - 1 })
+
   const results = await movieModel.getMoviesByCondition(cond)
   if (results.length > 0) {
     return res.json({
@@ -23,9 +27,10 @@ exports.listMovies = async (req, res) => {
       results,
       pageInfo: {
         totalData: results.length,
+        totalPage: Math.ceil(results.length / cond.limit),
         currentPage: cond.page,
-        nextLink: results.length < cond.limit ? null : `${APP_URL}/movies?page=${cond.page + 1}`,
-        prevLink: cond.page > 1 ? `${APP_URL}/movies?page=${cond.page - 1}` : null
+        nextLink: results.length < cond.limit ? null : APP_URL.concat(`/movies?${nextQuery}`),
+        prevLink: cond.page > 1 ? APP_URL.concat(`/movies?${prevQuery}`) : null
       }
     })
   } else {
@@ -87,24 +92,34 @@ exports.deleteMovie = async (req, res) => {
 }
 
 exports.updateMovie = (req, res) => {
-  const { id } = req.params
-  const data = req.body
-  movieModel.getMovieById(id, initialResult => {
-    if (initialResult.length > 0) {
-      movieModel.updateMovie(id, data, results => {
-        return res.json({
-          success: true,
-          message: 'Update data success',
-          results: {
-            ...initialResult[0],
-            ...data
-          }
-        })
-      })
-    } else {
+  upload(req, res, async err => {
+    const id = req.params.id
+    const data = req.body
+    if (err instanceof multer.MulterError) {
       return res.json({
         success: false,
-        message: 'Failed to update data'
+        message: 'Error uploading file'
+      })
+    } else if (err) {
+      return res.json({
+        success: false,
+        message: 'Error uploading file'
+      })
+    }
+    try {
+      const initialResult = await movieModel.updateMovie(id, data)
+      console.log(initialResult)
+      if (initialResult.affectedRows > 0) {
+        return res.json({
+          success: true,
+          massage: 'Movie have been updated',
+          initialResult
+        })
+      }
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Failed to update Movie'
       })
     }
   })

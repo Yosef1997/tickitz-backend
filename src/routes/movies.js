@@ -12,7 +12,7 @@ routes.get('/', moviesController.listMovies)
 routes.get('/:id', moviesController.detailMovies)
 routes.post('/', authMiddleware.authCheck, moviesController.createMoviesAsync)
 routes.put('/', moviesController.createMoviesAsync)
-routes.patch('/:id', moviesController.updateMovie)
+routes.patch('/:id', authMiddleware.authCheck, moviesController.updateMovie)
 routes.delete('/:id', authMiddleware.authCheck, moviesController.deleteMovie)
 
 module.exports = routes
