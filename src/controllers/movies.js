@@ -95,6 +95,7 @@ exports.updateMovie = (req, res) => {
   upload(req, res, async err => {
     const id = req.params.id
     const data = req.body
+    const selectedGenre = []
     if (err instanceof multer.MulterError) {
       return res.json({
         success: false,
@@ -106,17 +107,57 @@ exports.updateMovie = (req, res) => {
         message: 'Error uploading file'
       })
     }
-    try {
-      const initialResult = await movieModel.updateMovie(id, data)
-      console.log(initialResult)
-      if (initialResult.affectedRows > 0) {
+    if (typeof data.idGenre === 'object') {
+      const results = await genrerelation.checkGenresAsync(data.idGenre)
+      if (results.length !== data.idGenre.length) {
         return res.json({
-          success: true,
-          massage: 'Movie have been updated',
-          initialResult
+          success: false,
+          massage: 'Some genre are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedGenre.push(item.id)
         })
       }
+    } else if (typeof data.idGenre === 'string') {
+      const results = await genrerelation.checkGenres(data.idGenre)
+      if (results.length !== data.idGenre.length) {
+        return res.json({
+          success: false,
+          massage: 'Some genre are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedGenre.push(item.id)
+        })
+      }
+    }
+    const updateData = {
+      name: data.name,
+      releaseDate: data.releaseDate,
+      duration: data.duration,
+      genre: data.idGenre,
+      description: data.description,
+      director: data.director,
+      stars: data.stars,
+      picture: (req.file && req.file.path) || null,
+      createdBy: req.userData.id
+    }
+    try {
+      await movieModel.updateMovie(id, updateData)
+      await genrerelation.deleteMovieGenreByIdAsync(id)
+      const getMovieGenre = await genrerelation.createBulkMovieGenres(id, selectedGenre)
+      console.log(getMovieGenre)
+      const movies = await movieModel.getMovieByIdWithGenreAsync(id)
+      const genre = movies.map(item => item.genre)
+      await movieModel.insertGenreinMovie(id, genre)
+      return res.json({
+        success: true,
+        message: 'Movie successfully updated',
+        movies
+      })
     } catch (error) {
+      console.log(error)
       return res.status(400).json({
         success: false,
         message: 'Failed to update Movie'
@@ -181,10 +222,9 @@ exports.createMoviesAsync = (req, res) => {
       if (selectedGenre.length > 0) {
         await genrerelation.createBulkMovieGenres(initialResult.insertId, selectedGenre)
       }
-      const Genre = await genrerelation.checkGenresAsync(selectedGenre)
-      const idGenre = Genre.map(item => item.genre)
-      await movieModel.insertGenreinMovie(initialResult.insertId, idGenre)
       const movies = await movieModel.getMovieByIdWithGenreAsync(initialResult.insertId)
+      const genre = movies.map(item => item.genre)
+      await movieModel.insertGenreinMovie(initialResult.insertId, genre)
       if (movies.length > 0) {
         return res.json({
           success: true,
@@ -194,7 +234,7 @@ exports.createMoviesAsync = (req, res) => {
             name: movies[0].name,
             releaseDate: movies[0].releaseDate,
             duration: movies[0].duration,
-            genre: movies[0].genre,
+            genre: movies.map(movies => movies.genre),
             description: movies[0].description,
             director: movies[0].director,
             stars: movies[0].stars,

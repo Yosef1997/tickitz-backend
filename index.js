@@ -19,6 +19,7 @@ app.use('/movies', require('./src/routes/movies'))
 
 app.use('/', require('./src/routes/showTime'))
 app.use('/', require('./src/routes/location'))
+app.use('/', require('./src/routes/seats'))
 // admin
 app.use('/admin/movies', require('./src/routes/movies'))
 app.use('/admin/genre', require('./src/routes/genre'))
