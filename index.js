@@ -18,7 +18,7 @@ app.use('/uploads', express.static('uploads'))
 app.use('/movies', require('./src/routes/movies'))
 
 app.use('/', require('./src/routes/showTime'))
-
+app.use('/', require('./src/routes/location'))
 // admin
 app.use('/admin/movies', require('./src/routes/movies'))
 app.use('/admin/genre', require('./src/routes/genre'))

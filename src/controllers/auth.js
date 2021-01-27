@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken')
 const { APP_KEY } = process.env
 
 exports.login = async (req, res) => {
-  const { username, password } = req.body
-  const existingUser = await authModal.getUserByConditionAsync({ username })
+  const { email, password } = req.body
+  const existingUser = await authModal.getUserByConditionAsync({ email })
   if (existingUser.length > 0) {
     const compare = await bcrypt.compare(password, existingUser[0].password)
     if (compare) {
@@ -20,17 +20,17 @@ exports.login = async (req, res) => {
   }
   return res.status(401).json({
     success: true,
-    massage: 'Wrong username or password'
+    massage: 'Wrong email or password'
   })
 }
 
 exports.register = async (req, res) => {
-  const { username, password } = req.body
-  const isExists = await authModal.getUserByConditionAsync({ username, password })
-  if (isExists.length > 1) {
+  const { email, password } = req.body
+  const isExists = await authModal.getUserByConditionAsync({ email, password })
+  if (isExists.length < 1) {
     const salt = await bcrypt.genSalt()
     const encryptedPassword = await bcrypt.hash(password, salt)
-    const results = await authModal.createUserAsync({ username, password: encryptedPassword })
+    const results = await authModal.createUserAsync({ email, password: encryptedPassword })
     if (results.insertId > 0) {
       return res.json({
         success: true,
@@ -45,7 +45,7 @@ exports.register = async (req, res) => {
   } else {
     return res.json({
       success: true,
-      massage: 'username or password have been used'
+      massage: 'email or password have been used'
     })
   }
 }
