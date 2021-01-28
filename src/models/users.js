@@ -1,9 +1,9 @@
 const db = require('../helpers/db')
 
-exports.getUserByemailAsync = (id) => {
+exports.getUserByemailAsync = (email) => {
   return new Promise((resolve, reject) => {
     const query = db.query(`
-    SELECT * FROM users WHERE email = ${id}
+    SELECT * FROM users WHERE email = ${email}
   `, (err, res, field) => {
       if (err) reject(err)
       // console.log(field)

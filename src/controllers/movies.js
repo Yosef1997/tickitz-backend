@@ -144,17 +144,19 @@ exports.updateMovie = (req, res) => {
       createdBy: req.userData.id
     }
     try {
+      // if (moviesUpdate.affectedRows > 0) {
       await movieModel.updateMovie(id, updateData)
       await genrerelation.deleteMovieGenreByIdAsync(id)
-      const getMovieGenre = await genrerelation.createBulkMovieGenres(id, selectedGenre)
-      console.log(getMovieGenre)
+      await genrerelation.createBulkMovieGenres(id, selectedGenre)
       const movies = await movieModel.getMovieByIdWithGenreAsync(id)
       const genre = movies.map(item => item.genre)
       await movieModel.insertGenreinMovie(id, genre)
+      const updateMovie = await movieModel.getMovieByIdAsync(id)
+
       return res.json({
         success: true,
         message: 'Movie successfully updated',
-        movies
+        updateMovie
       })
     } catch (error) {
       console.log(error)

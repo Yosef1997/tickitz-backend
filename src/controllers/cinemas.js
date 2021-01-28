@@ -190,15 +190,15 @@ exports.updateCinemas = (req, res) => {
     try {
       await cinemasModel.updateCinema(id, updateData)
       await cinemasRelation.deleteCinemaScheduleByIdAsync(id)
-      const getMovieGenre = await cinemasRelation.createBulkCinemaSchedule(id, selectedShowTime)
-      console.log(getMovieGenre)
+      await cinemasRelation.createBulkCinemaSchedule(id, selectedShowTime)
       const movies = await cinemasModel.getCinemasByIdWithShowTimeAsync(id)
       const showTime = movies.map(item => item.time)
       await cinemasModel.insertShowTimeinCinema(id, showTime)
+      const updateCinema = await cinemasModel.getCinemaByIdAsync(id)
       return res.json({
         success: true,
-        message: 'Movie successfully updated',
-        movies
+        message: 'Cinema successfully updated',
+        updateCinema
       })
     } catch (error) {
       console.log(error)

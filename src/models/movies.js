@@ -107,9 +107,9 @@ exports.updateMovie = (id, data) => {
       SET ${key.map((item, index) => `${item}="${value[index]}"`)}
       WHERE id=${id}
     `, (err, res, field) => {
-      if (err) resolve(err)
+      if (err) reject(err)
       // console.log(field)
-      reject(res)
+      resolve(res)
     })
     console.log(query.sql)
   })

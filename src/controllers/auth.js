@@ -6,8 +6,8 @@ const { APP_KEY } = process.env
 exports.login = async (req, res) => {
   const { email, password } = req.body
   const existingUser = await authModal.getUserByConditionAsync({ email })
-  console.log(existingUser)
   if (existingUser.length > 0) {
+    console.log(existingUser.length)
     const compare = await bcrypt.compare(password, existingUser[0].password)
     console.log(compare)
     if (compare) {
