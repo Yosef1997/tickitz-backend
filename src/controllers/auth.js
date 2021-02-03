@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
   }
   return res.status(401).json({
     success: false,
-    massage: 'Wrong email or password'
+    message: 'Wrong email or password'
   })
 }
 
@@ -36,18 +36,18 @@ exports.register = async (req, res) => {
     if (results.insertId > 0) {
       return res.json({
         success: true,
-        massage: 'register successfully'
+        result: 'register successfully'
       })
     } else {
       return res.json({
         success: false,
-        massage: 'register failed'
+        result: 'register failed'
       })
     }
   } else {
-    return res.json({
+    return res.status(401).json({
       success: false,
-      massage: 'email or password have been used'
+      message: 'email or password have been used'
     })
   }
 }

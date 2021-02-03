@@ -21,7 +21,7 @@ exports.listMovies = async (req, res) => {
 
   const results = await movieModel.getMoviesByCondition(cond)
   if (results.length > 0) {
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: 'List of all Movies',
       results,
