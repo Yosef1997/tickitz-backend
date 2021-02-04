@@ -17,6 +17,7 @@ app.use('/uploads', express.static('./uploads'))
 // user
 app.use('/movies', require('./src/routes/movies'))
 
+app.use('/', require('./src/routes/date'))
 app.use('/', require('./src/routes/showTime'))
 app.use('/', require('./src/routes/location'))
 app.use('/', require('./src/routes/seats'))

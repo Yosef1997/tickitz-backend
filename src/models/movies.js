@@ -85,6 +85,54 @@ exports.getMovieByIdWithGenreAsync = (id) => {
   })
 }
 
+exports.getMovieByIdWithDateAsync = (id) => {
+  return new Promise((resolve, reject) => {
+    const query = db.query(`
+    SELECT m.id, m.name, m.releaseDate, sd.date, m.duration, m.description, m.director, m.stars, m.createdBy  
+    FROM movies m
+    INNER JOIN moviedate md ON m.id=md.idMovie
+    INNER JOIN showdate sd ON sd.id=md.idDate
+    WHERE m.id=${id}
+  `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+    console.log(query.sql)
+  })
+}
+
+exports.getMovieByIdWithLocationAsync = (id) => {
+  return new Promise((resolve, reject) => {
+    const query = db.query(`
+    SELECT m.id, m.name, m.releaseDate, L.city, m.duration, m.description, m.director, m.stars, m.createdBy  
+    FROM movies m
+    INNER JOIN movielocation ml ON m.id=ml.idMovie
+    INNER JOIN location L ON L.id=ml.idLocation
+    WHERE m.id=${id}
+  `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+    console.log(query.sql)
+  })
+}
+
+exports.getMovieByIdWithcinemasAsync = (id) => {
+  return new Promise((resolve, reject) => {
+    const query = db.query(`
+    SELECT m.id, m.name, m.releaseDate, c.name as cinemaName, m.duration, m.description, m.director, m.stars, m.createdBy  
+    FROM movies m
+    INNER JOIN moviecinemas mc ON m.id=mc.idMovie
+    INNER JOIN cinemas c ON c.id=mc.idCinema
+    WHERE m.id=${id}
+  `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+    console.log(query.sql)
+  })
+}
+
 exports.deleteMovieByIdAsync = (id) => {
   return new Promise((resolve, reject) => {
     const query = db.query(`
@@ -129,6 +177,47 @@ exports.insertGenreinMovie = (id, data) => {
   })
 }
 
+exports.insertDateinMovie = (id, data) => {
+  return new Promise((resolve, reject) => {
+    const dataDate = data.join(', ')
+    db.query(`
+      UPDATE movies
+      SET date = "${dataDate}"
+      WHERE id=${id}
+    `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+  })
+}
+
+exports.insertLocationinMovie = (id, data) => {
+  return new Promise((resolve, reject) => {
+    const dataLocation = data.join(', ')
+    db.query(`
+      UPDATE movies
+      SET location = "${dataLocation}"
+      WHERE id=${id}
+    `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+  })
+}
+
+exports.insertCinemainMovie = (id, data) => {
+  return new Promise((resolve, reject) => {
+    const dataCinema = data.join(', ')
+    db.query(`
+      UPDATE movies
+      SET cinema = "${dataCinema}"
+      WHERE id=${id}
+    `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+  })
+}
 // exports.createMovies = (data = {}) => {
 //   return new Promise((resolve, reject) => {
 //     const query = db.query(`

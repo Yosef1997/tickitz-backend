@@ -96,6 +96,9 @@ exports.updateMovie = (req, res) => {
     const id = req.params.id
     const data = req.body
     const selectedGenre = []
+    const selectedDate = []
+    const selectedLocation = []
+    const selectedCinema = []
     if (err instanceof multer.MulterError) {
       return res.json({
         success: false,
@@ -132,6 +135,48 @@ exports.updateMovie = (req, res) => {
         })
       }
     }
+    if (typeof data.idDate === 'string') {
+      const results = await genrerelation.checkDate(data.idDate)
+      if (results.length !== data.idDate.length) {
+        return res.json({
+          success: false,
+          massage: 'Some Date are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedDate.push(item.id)
+        })
+      }
+    }
+
+    if (typeof data.idLocation === 'object') {
+      const results = await genrerelation.checklocationAsync(data.idLocation)
+      if (results.length !== data.idLocation.length) {
+        return res.json({
+          success: false,
+          massage: 'Some Location are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedLocation.push(item.id)
+        })
+      }
+    }
+
+    if (typeof data.idCinema === 'object') {
+      const results = await genrerelation.checkCinemaAsync(data.idCinema)
+      if (results.length !== data.idCinema.length) {
+        return res.json({
+          success: false,
+          massage: 'Some Cinema are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedCinema.push(item.id)
+        })
+      }
+    }
+
     const updateData = {
       name: data.name,
       releaseDate: data.releaseDate,
@@ -144,13 +189,29 @@ exports.updateMovie = (req, res) => {
       createdBy: req.userData.id
     }
     try {
-      // if (moviesUpdate.affectedRows > 0) {
       await movieModel.updateMovie(id, updateData)
       await genrerelation.deleteMovieGenreByIdAsync(id)
+      await genrerelation.deleteMovieDateByIdAsync(id)
+      await genrerelation.deleteMovieLocationByIdAsync(id)
+      await genrerelation.deleteMovieCinemaByIdAsync(id)
       await genrerelation.createBulkMovieGenres(id, selectedGenre)
-      const movies = await movieModel.getMovieByIdWithGenreAsync(id)
-      const genre = movies.map(item => item.genre)
+      await genrerelation.createBulkMovieDate(id, selectedDate)
+      await genrerelation.createBulkMovieLocation(id, selectedLocation)
+      await genrerelation.createBulkMovieCinema(id, selectedCinema)
+      const moviesGenre = await movieModel.getMovieByIdWithGenreAsync(id)
+      const genre = moviesGenre.map(item => item.genre)
       await movieModel.insertGenreinMovie(id, genre)
+      const moviesDate = await movieModel.getMovieByIdWithDateAsync(id)
+      const date = moviesDate.map(item => item.date)
+      console.log(date)
+      await movieModel.insertDateinMovie(id, date)
+      const moviesLocation = await movieModel.getMovieByIdWithLocationAsync(id)
+      const location = moviesLocation.map(item => item.city)
+      await movieModel.insertLocationinMovie(id, location)
+      const moviesCinema = await movieModel.getMovieByIdWithcinemasAsync(id)
+      const cinema = moviesCinema.map(item => item.cinemaName)
+      await movieModel.insertCinemainMovie(id, cinema)
+
       const updateMovie = await movieModel.getMovieByIdAsync(id)
 
       return res.json({
@@ -172,6 +233,9 @@ exports.createMoviesAsync = (req, res) => {
   upload(req, res, async err => {
     const data = req.body
     const selectedGenre = []
+    const selectedDate = []
+    const selectedLocation = []
+    const selectedCinema = []
     if (err instanceof multer.MulterError) {
       return res.json({
         success: false,
@@ -208,6 +272,48 @@ exports.createMoviesAsync = (req, res) => {
         })
       }
     }
+
+    if (typeof data.idDate === 'string') {
+      const results = await genrerelation.checkDate(data.idDate)
+      if (results.length !== data.idDate.length) {
+        return res.json({
+          success: false,
+          massage: 'Some Date are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedDate.push(item.id)
+        })
+      }
+    }
+
+    if (typeof data.idLocation === 'object') {
+      const results = await genrerelation.checklocationAsync(data.idLocation)
+      if (results.length !== data.idLocation.length) {
+        return res.json({
+          success: false,
+          massage: 'Some Location are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedLocation.push(item.id)
+        })
+      }
+    }
+
+    if (typeof data.idCinema === 'object') {
+      const results = await genrerelation.checkCinemaAsync(data.idCinema)
+      if (results.length !== data.idCinema.length) {
+        return res.json({
+          success: false,
+          massage: 'Some Cinema are unavailable'
+        })
+      } else {
+        results.forEach(item => {
+          selectedCinema.push(item.id)
+        })
+      }
+    }
     const movieData = {
       name: data.name,
       releaseDate: data.releaseDate,
@@ -224,23 +330,44 @@ exports.createMoviesAsync = (req, res) => {
       if (selectedGenre.length > 0) {
         await genrerelation.createBulkMovieGenres(initialResult.insertId, selectedGenre)
       }
-      const movies = await movieModel.getMovieByIdWithGenreAsync(initialResult.insertId)
-      const genre = movies.map(item => item.genre)
+      if (selectedDate.length > 0) {
+        await genrerelation.createBulkMovieDate(initialResult.insertId, selectedDate)
+      }
+      if (selectedLocation.length > 0) {
+        await genrerelation.createBulkMovieLocation(initialResult.insertId, selectedLocation)
+      }
+      if (selectedCinema.length > 0) {
+        await genrerelation.createBulkMovieCinema(initialResult.insertId, selectedCinema)
+      }
+      const moviesGenre = await movieModel.getMovieByIdWithGenreAsync(initialResult.insertId)
+      const genre = moviesGenre.map(item => item.genre)
       await movieModel.insertGenreinMovie(initialResult.insertId, genre)
-      if (movies.length > 0) {
+      const moviesDate = await movieModel.getMovieByIdWithDateAsync(initialResult.insertId)
+      const date = moviesDate.map(item => item.date)
+      await movieModel.insertDateinMovie(initialResult.insertId, date)
+      const moviesLocation = await movieModel.getMovieByIdWithLocationAsync(initialResult.insertId)
+      const location = moviesLocation.map(item => item.city)
+      await movieModel.insertLocationinMovie(initialResult.insertId, location)
+      const moviesCinema = await movieModel.getMovieByIdWithcinemasAsync(initialResult.insertId)
+      const cinema = moviesCinema.map(item => item.cinemaName)
+      await movieModel.insertCinemainMovie(initialResult.insertId, cinema)
+      if (moviesCinema.length > 0) {
         return res.json({
           success: true,
           message: 'Movie successfully created',
           results: {
-            id: movies[0].id,
-            name: movies[0].name,
-            releaseDate: movies[0].releaseDate,
-            duration: movies[0].duration,
-            genre: movies.map(movies => movies.genre),
-            description: movies[0].description,
-            director: movies[0].director,
-            stars: movies[0].stars,
-            createdBy: movies[0].createdBy
+            id: moviesGenre[0].id,
+            name: moviesGenre[0].name,
+            releaseDate: moviesGenre[0].releaseDate,
+            duration: moviesGenre[0].duration,
+            genre: moviesGenre.map(movies => movies.genre),
+            description: moviesGenre[0].description,
+            director: moviesGenre[0].director,
+            stars: moviesGenre[0].stars,
+            createdBy: moviesGenre[0].createdBy,
+            date: moviesDate.map(movies => movies.date),
+            location: moviesLocation.map(movies => movies.city),
+            cinema: moviesCinema.map(movies => movies.cinemaName)
           }
         })
       } else {
