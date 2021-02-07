@@ -40,15 +40,15 @@ exports.listMovies = async (req, res) => {
 
 exports.listMovieByGenre = async (req, res) => {
   const cond = req.params.name
-  const results = await movieModel.getMovieByGenre(cond)
+  const results = await movieModel.getMoviesByCondition(cond)
   if (results.length > 0) {
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: 'Details of Movie',
       results
     })
   } else {
-    return res.json({
+    return res.status(400).json({
       success: true,
       message: `Movie with genre ${cond} not found`
     })
@@ -58,11 +58,12 @@ exports.listMovieByGenre = async (req, res) => {
 exports.detailMovies = async (req, res) => {
   const id = req.params.id
   const results = await movieModel.getMovieByIdAsync(id)
+  console.log(results)
   if (results.length > 0) {
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: 'Details of Movie',
-      results: results[0]
+      results
     })
   } else {
     return res.status(400).json({
@@ -78,14 +79,14 @@ exports.deleteMovie = async (req, res) => {
   if (initialResult.length > 0) {
     const results = await movieModel.deleteMovieByIdAsync(id)
     if (results) {
-      return res.json({
+      return res.status(200).json({
         success: true,
         message: 'Data deleted successfully',
         results: initialResult[0]
       })
     }
   }
-  return res.json({
+  return res.status(400).json({
     success: false,
     message: 'Failed to delete data'
   })
@@ -100,12 +101,12 @@ exports.updateMovie = (req, res) => {
     const selectedLocation = []
     const selectedCinema = []
     if (err instanceof multer.MulterError) {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: 'Error uploading file'
       })
     } else if (err) {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: 'Error uploading file'
       })
@@ -113,7 +114,7 @@ exports.updateMovie = (req, res) => {
     if (typeof data.idGenre === 'object') {
       const results = await genrerelation.checkGenresAsync(data.idGenre)
       if (results.length !== data.idGenre.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some genre are unavailable'
         })
@@ -125,7 +126,7 @@ exports.updateMovie = (req, res) => {
     } else if (typeof data.idGenre === 'string') {
       const results = await genrerelation.checkGenres(data.idGenre)
       if (results.length !== data.idGenre.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some genre are unavailable'
         })
@@ -138,7 +139,7 @@ exports.updateMovie = (req, res) => {
     if (typeof data.idDate === 'string') {
       const results = await genrerelation.checkDate(data.idDate)
       if (results.length !== data.idDate.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some Date are unavailable'
         })
@@ -152,7 +153,7 @@ exports.updateMovie = (req, res) => {
     if (typeof data.idLocation === 'object') {
       const results = await genrerelation.checklocationAsync(data.idLocation)
       if (results.length !== data.idLocation.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some Location are unavailable'
         })
@@ -166,7 +167,7 @@ exports.updateMovie = (req, res) => {
     if (typeof data.idCinema === 'object') {
       const results = await genrerelation.checkCinemaAsync(data.idCinema)
       if (results.length !== data.idCinema.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some Cinema are unavailable'
         })
@@ -214,7 +215,7 @@ exports.updateMovie = (req, res) => {
 
       const updateMovie = await movieModel.getMovieByIdAsync(id)
 
-      return res.json({
+      return res.status(200).json({
         success: true,
         message: 'Movie successfully updated',
         updateMovie
@@ -237,12 +238,12 @@ exports.createMoviesAsync = (req, res) => {
     const selectedLocation = []
     const selectedCinema = []
     if (err instanceof multer.MulterError) {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: 'Error uploading file'
       })
     } else if (err) {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: 'Error uploading file'
       })
@@ -250,7 +251,7 @@ exports.createMoviesAsync = (req, res) => {
     if (typeof data.idGenre === 'object') {
       const results = await genrerelation.checkGenresAsync(data.idGenre)
       if (results.length !== data.idGenre.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some genre are unavailable'
         })
@@ -262,7 +263,7 @@ exports.createMoviesAsync = (req, res) => {
     } else if (typeof data.idGenre === 'string') {
       const results = await genrerelation.checkGenres(data.idGenre)
       if (results.length !== data.idGenre.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some genre are unavailable'
         })
@@ -276,7 +277,7 @@ exports.createMoviesAsync = (req, res) => {
     if (typeof data.idDate === 'string') {
       const results = await genrerelation.checkDate(data.idDate)
       if (results.length !== data.idDate.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some Date are unavailable'
         })
@@ -290,7 +291,7 @@ exports.createMoviesAsync = (req, res) => {
     if (typeof data.idLocation === 'object') {
       const results = await genrerelation.checklocationAsync(data.idLocation)
       if (results.length !== data.idLocation.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some Location are unavailable'
         })
@@ -304,7 +305,7 @@ exports.createMoviesAsync = (req, res) => {
     if (typeof data.idCinema === 'object') {
       const results = await genrerelation.checkCinemaAsync(data.idCinema)
       if (results.length !== data.idCinema.length) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           massage: 'Some Cinema are unavailable'
         })
@@ -352,7 +353,7 @@ exports.createMoviesAsync = (req, res) => {
       const cinema = moviesCinema.map(item => item.cinemaName)
       await movieModel.insertCinemainMovie(initialResult.insertId, cinema)
       if (moviesCinema.length > 0) {
-        return res.json({
+        return res.status(200).json({
           success: true,
           message: 'Movie successfully created',
           results: {

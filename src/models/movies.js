@@ -69,6 +69,28 @@ exports.getMovieByIdAsync = (id) => {
   })
 }
 
+exports.getMovieDetailAsync = (id) => {
+  return new Promise((resolve, reject) => {
+    const query = db.query(`
+    SELECT m.id, m.name, m.releaseDate, g.genre, sd.date, L.city, c.name as cinemaName, m.duration, m.description, m.director, m.stars, m.createdBy
+    FROM movies m
+    INNER JOIN movierelation mr ON m.id=mr.idMovie
+    INNER JOIN genre g ON g.id=mr.idGenre
+    INNER JOIN moviedate md ON m.id=md.idMovie
+    INNER JOIN showdate sd ON sd.id=md.idDate
+    INNER JOIN movielocation ml ON m.id=ml.idMovie
+    INNER JOIN location L ON L.id=ml.idLocation
+    INNER JOIN moviecinemas mc ON m.id=mc.idMovie
+    INNER JOIN cinemas c ON c.id=mc.idCinema
+    WHERE m.id=${id}
+  `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+    console.log(query.sql)
+  })
+}
+
 exports.getMovieByIdWithGenreAsync = (id) => {
   return new Promise((resolve, reject) => {
     const query = db.query(`

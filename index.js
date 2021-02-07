@@ -15,14 +15,14 @@ app.use(cors('*'))
 app.use('/uploads', express.static('./uploads'))
 
 // user
-app.use('/movies', require('./src/routes/movies'))
+app.use('/', require('./src/routes/movies'))
 
 app.use('/', require('./src/routes/date'))
 app.use('/', require('./src/routes/showTime'))
 app.use('/', require('./src/routes/location'))
 app.use('/', require('./src/routes/seats'))
 // admin
-app.use('/admin/movies', require('./src/routes/movies'))
+
 app.use('/admin/genre', require('./src/routes/genre'))
 app.use('/admin/cinemas', require('./src/routes/cinemas'))
 app.use('/', require('./src/routes/cinemas'))
