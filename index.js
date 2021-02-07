@@ -29,6 +29,10 @@ app.use('/', require('./src/routes/cinemas'))
 app.use('/', require('./src/routes/movies'))
 app.use('/auth', require('./src/routes/auth'))
 
+app.listen(APP_PORT, () => {
+  console.log(`App is running on port 8080 ${APP_PORT}`)
+})
+
 // app.use('/test', require('./src/routes/routes'))
 
 // app.get('/', (request, response) => {
@@ -42,7 +46,3 @@ app.use('/auth', require('./src/routes/auth'))
 //     })
 //   }
 // })
-
-app.listen(APP_PORT, () => {
-  console.log(`App is running on port 8080 ${APP_PORT}`)
-})
