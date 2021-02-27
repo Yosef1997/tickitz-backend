@@ -63,7 +63,7 @@ exports.detailMovies = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Details of Movie',
-      results
+      results: results[0]
     })
   } else {
     return res.status(400).json({

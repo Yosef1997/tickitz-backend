@@ -55,28 +55,72 @@ exports.detailTransaction = async (req, res) => {
 
 exports.createTransaction = async (req, res) => {
   const data = req.body
-  const checkData = {
+  const selectedSeats = []
+  if (typeof data.seats === 'object') {
+    const results = await transactionRelation.checkTransactionSeatObject(data.seats)
+    if (results.length !== data.seats.length) {
+      return res.json({
+        success: false,
+        massage: 'Some seats are unavailable'
+      })
+    } else {
+      results.forEach(item => {
+        selectedSeats.push(item.id)
+      })
+    }
+  } else if (typeof data.seats === 'string') {
+    const results = await transactionRelation.checkTransactionSeatstring(data.seats)
+    if (results.length !== data.seats.length) {
+      return res.json({
+        success: false,
+        massage: 'Some seat are unavailable'
+      })
+    } else {
+      results.forEach(item => {
+        selectedSeats.push(item.id)
+      })
+    }
+  }
+  const transactionData = {
     movie: data.movie,
     date: data.date,
     location: data.location,
+    cinema: data.cinema,
     time: data.time,
-    seats: data.seats
-  }
-  const results = await transactionRelation.checkTransactionSeat(checkData)
-  if (results.length > 0) {
-    return res.json({
-      success: false,
-      massage: 'Some seat has Occupied'
-    })
+    category: data.category,
+    createdBy: req.userData.id
   }
   try {
-    const initialResult = await transactionModel.createTransaction(data)
-    if (initialResult.affectedRows > 0) {
-      return res.json({
-        success: true,
-        message: 'transaction successfully created',
-        initialResult
-      })
+    const check = await transactionRelation.checkTransactionSeat(transactionData)
+    if (check.length < 1) {
+      const initialResult = await transactionModel.createTransaction(transactionData)
+      if (initialResult.affectedRows > 0) {
+        if (selectedSeats.length > 0) {
+          await transactionRelation.createBulkTransactionSeat(initialResult.insertId, selectedSeats)
+        }
+        const transaction = await transactionModel.getTransactionByIdWithSeatAsync(initialResult.insertId)
+        const seats = transaction.map(item => item.seatName)
+        await transactionModel.insertSeatsinTransaction(initialResult.insertId, seats)
+        console.log(seats)
+        if (transaction.length > 0) {
+          return res.json({
+            success: true,
+            message: 'Transaction successfully created',
+            results: {
+              id: transaction[0].id,
+              movie: transaction[0].movie,
+              date: transaction[0].date,
+              location: transaction[0].location,
+              cinema: transaction[0].cinema,
+              time: transaction[0].time,
+              category: transaction[0].category,
+              // count: Number(data.seats.length),
+              // totalPrice: Number(data.seats.length * 10),
+              createdBy: transaction[0].createdBy
+            }
+          })
+        }
+      }
     }
   } catch (error) {
     console.log(error)

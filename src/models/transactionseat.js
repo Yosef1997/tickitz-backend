@@ -22,7 +22,7 @@ exports.createBulkTransactionSeat = async (id, data = []) => {
     INSERT INTO transactionseat
     (idTransaction, idSeat)
     VALUES
-    ${data.map(idSeat => `(${id}, ${idSeat})`).join()}
+    ${data.map(Seats => `(${id}, ${Seats})`).join()}
     `, (err, res, field) => {
       if (err) reject(err)
       resolve(res)
@@ -35,7 +35,7 @@ exports.checkTransactionSeat = (data) => {
   return new Promise((resolve, reject) => {
     const query = db.query(`
     SELECT * FROM transaction
-    WHERE movie=${data.movie} AND date=${data.date} AND location=${data.location} AND time=${data.time} AND seats LIKE "%${data.seats}%"
+    WHERE movie=${data.movie} AND date=${data.date} AND location=${data.location} AND cinema=${data.cinema} AND time=${data.time} AND seats LIKE "%${data.seats}%"
     `, (err, res, field) => {
       if (err) reject(err)
       resolve(res)
@@ -48,7 +48,20 @@ exports.checkTransactionSeatObject = (data) => {
   return new Promise((resolve, reject) => {
     const query = db.query(`
     SELECT * FROM seats
-    WHERE id IN (${data.map(item => item).join()})
+    WHERE name IN (${data.map(item => item).join()})
+    `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+    console.log(query.sql)
+  })
+}
+
+exports.checkTransactionSeatstring = (data) => {
+  return new Promise((resolve, reject) => {
+    const query = db.query(`
+    SELECT * FROM seats
+    WHERE name = ${data}
     `, (err, res, field) => {
       if (err) reject(err)
       resolve(res)

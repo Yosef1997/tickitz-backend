@@ -90,7 +90,7 @@ exports.updateTransaction = (id, data) => {
     console.log(query.sql)
   })
 }
-exports.insertShowTimeinCinema = (id, data) => {
+exports.insertSeatsinTransaction = (id, data) => {
   return new Promise((resolve, reject) => {
     const idSeat = data.join(', ')
     db.query(`
