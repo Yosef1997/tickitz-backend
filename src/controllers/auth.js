@@ -8,9 +8,7 @@ exports.login = async (req, res) => {
   const { email, password } = req.body
   const existingUser = await authModal.getUserByConditionAsync({ email })
   if (existingUser.length > 0) {
-    console.log(existingUser.length)
     const compare = await bcrypt.compare(password, existingUser[0].password)
-    console.log(compare)
     if (compare) {
       const { id } = existingUser[0]
       const token = jwt.sign({ id }, APP_KEY)
@@ -162,6 +160,20 @@ exports.register = async (req, res) => {
 //   }
 // }
 
+exports.detailUser = async (req, res) => {
+  try {
+    const { id } = req.params
+    const getData = await authModal.getUserByConditionAsync({ id })
+    console.log(getData)
+    if (getData.length > 0) {
+      return response(res, 200, true, 'Detail user', getData[0])
+    }
+  } catch (err) {
+    console.log(err)
+    return response(res, 400, false, 'User not found')
+  }
+}
+
 exports.updateUser = async (req, res) => {
   try {
     const id = req.params.id
@@ -172,14 +184,9 @@ exports.updateUser = async (req, res) => {
       const getUser = await authModal.getUserByIdAsync(id)
       if (getUser.length > 0) {
         return response(res, 200, true, 'Update data success', getUser)
-        // json({
-        //   success: true,
-        //   message: 'Update data success',
-        //   getUser
-        // })
       }
     }
-  } catch (eror) {
+  } catch (error) {
     return res.json({
       success: false,
       message: 'Failed to update data'
